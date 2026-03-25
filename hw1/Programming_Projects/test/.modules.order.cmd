@@ -1,1 +1,1 @@
-savedcmd_/home/user/projects/Operating-System-Homework/hw1/Programming_Projects/modules.order := {   echo /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/hello.o; :; } > /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/modules.order
+savedcmd_/home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/modules.order := {   echo /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/hello.o; :; } > /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/modules.order
