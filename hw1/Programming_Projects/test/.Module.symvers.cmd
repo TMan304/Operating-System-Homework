@@ -1,1 +1,0 @@
-savedcmd_/home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/Module.symvers -T /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/modules.order -i Module.symvers -e 

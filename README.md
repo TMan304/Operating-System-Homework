@@ -1,5 +1,5 @@
 # Operating-System-Homework
-### 在寫module時要放進c_cpp_properties.json
+### 在寫module時要放進c_cpp_properties.json不然會爆紅(不過不放編譯也可以過)
 ``` json
 {
     "configurations": [

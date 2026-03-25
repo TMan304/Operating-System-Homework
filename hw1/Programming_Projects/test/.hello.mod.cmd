@@ -1,1 +1,0 @@
-savedcmd_/home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/hello.mod := printf '%s\n'   hello.o | awk '!x[$$0]++ { print("/home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/"$$0) }' > /home/user/projects/Operating-System-Homework/hw1/Programming_Projects/test/hello.mod
