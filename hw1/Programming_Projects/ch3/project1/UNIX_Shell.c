@@ -41,14 +41,35 @@ int find_symbol_in_array(char **array, const char *symbol) {
     return 0;
 }
 
+void handle_redirection(char **args) { // I/O處理
+    int in_pos = find_symbol_in_array(args, "<");
+    if (in_pos > 0) {
+        int fd = open(args[in_pos + 1], O_RDONLY);
+        if (fd != -1) {
+            dup2(fd, STDIN_FILENO);
+            close(fd);
+            args[in_pos] = NULL;
+        }
+    }
+    int out_pos = find_symbol_in_array(args, ">");
+    if (out_pos > 0) {
+        int fd = open(args[out_pos + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd != -1) {
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+            args[out_pos] = NULL;
+        }
+    }
+}
+
 int main() {
-    signal(SIGCHLD, handler);
-    char cwd[MAX_PATH], input[MAX_LINE], in_file_path[MAX_PATH], out_file_path[MAX_PATH];
-    char *args[MAX_ARGS], *token;
-    char *history[MAX_ARGS];
+    signal(SIGCHLD, handler); // 回收背景處理的child
+    char cwd[MAX_PATH], input[MAX_LINE];
+    char *args[MAX_ARGS], *history[MAX_ARGS];
+    char *token;
     history[0] = NULL;
-    char c;
-    int keep_run = 1, redirect_in = 0, redirect_out = 0, pipe_pos = 0, pipe_fd[2];
+    int keep_run = 1;
+    int pipe_pos = 0;
     while (keep_run) {
         int need_wait = 1;
 
@@ -94,20 +115,8 @@ int main() {
             deep_copy_args(args, history);
         }
 
-        // 先找出所有需要特別處理的符號
-        redirect_in = find_symbol_in_array(args, "<");
-        redirect_out = find_symbol_in_array(args, ">");
+        // 先找出|的位置
         pipe_pos = find_symbol_in_array(args, "|");
-
-        // 處理I/O重定位
-        if (redirect_in > 0) {
-            strcpy(in_file_path, args[redirect_in+1]);
-            args[redirect_in] = NULL;
-        }
-        if (redirect_out > 0) {
-            strcpy(out_file_path, args[redirect_out+1]);
-            args[redirect_out] = NULL;
-        }
 
         // 處理&
         if (index > 0 && strcmp(args[index], "&") == 0) {
@@ -115,44 +124,72 @@ int main() {
             args[index--] = NULL;
         }
         
-        // 呼叫child
-        int pid = fork();
-        if (pid < 0) { // error
-            fprintf(stderr, "Error: can't call fork().");
-            return 1;
-        }
-        else if (pid == 0) { // child
-            if (redirect_in > 0) { // 重定位I/O
-                int fd_in = open(in_file_path, O_RDONLY);
-                if (fd_in == -1) {
-                    perror("Error opening input file");
-                    exit(1); 
-                }
-                dup2(fd_in, STDIN_FILENO);
-                close(fd_in); // 不close也可以，fd_in是區域變數
+        // 有|的情況這樣fork(只能處理一個|)
+        if (pipe_pos > 0) {
+            // 把命令拆成兩個
+            args[pipe_pos] = NULL;
+            char **args_left = args;
+            char **args_right = &args[pipe_pos + 1];
+            // 開始呼叫child
+            int fd[2];
+            if (pipe(fd) == -1) { perror("Pipe failed"); continue; }
+            pid_t p1 = fork();
+            if (p1 < 0) {
+                perror("Fork P1 failed");
+                close(fd[0]); close(fd[1]);
+                continue;
             }
-            if (redirect_out > 0) {
-                int fd_out = open(out_file_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                if (fd_out == -1) { // 這個判斷或許不需要
-                    perror("Error opening output file");
-                    exit(1); 
-                }
-                dup2(fd_out, STDOUT_FILENO);
-                close(fd_out);
-            }
-            if (execvp(args[0], args) == -1) { // 呼叫對應進程取代自己(child)，執行失敗的話跑以下程式
-                fprintf(stderr, "Error: can't run \"");
-                for (int j = 0; args[j] != NULL; j++) {
-                    fprintf(stderr, "%s%s", args[j], (args[j+1] != NULL) ? " " : "");
-                }
-                fprintf(stderr, "\"\n");
-                perror("Reason");
+            if (p1 == 0) {
+                handle_redirection(args_left); 
+                dup2(fd[1], STDOUT_FILENO);
+                close(fd[0]); close(fd[1]);
+                execvp(args_left[0], args_left);
                 exit(1);
             }
-        }
-        else { //parent
+            pid_t p2 = fork();
+            if (p2 < 0) {
+                perror("Fork P2 failed");
+                kill(p1, SIGKILL);
+                close(fd[0]); close(fd[1]);
+                continue;
+            }
+            if (p2 == 0) {
+                handle_redirection(args_right); 
+                dup2(fd[0], STDIN_FILENO);
+                close(fd[1]); close(fd[0]);
+                execvp(args_right[0], args_right);
+                exit(1);
+            }
+            // parent
+            close(fd[0]); close(fd[1]);
             if (need_wait) {
-                waitpid(pid, NULL, 0);
+                waitpid(p1, NULL, 0);
+                waitpid(p2, NULL, 0);
+            }
+        }
+        // 沒|時的fork
+        else {
+            int pid = fork();
+            if (pid < 0) { // error
+                fprintf(stderr, "Error: can't call fork().");
+                return 1;
+            }
+            else if (pid == 0) { // child
+                handle_redirection(args);
+                if (execvp(args[0], args) == -1) { // 呼叫對應進程取代自己(child)，執行失敗的話跑以下程式
+                    fprintf(stderr, "Error: can't run \"");
+                    for (int j = 0; args[j] != NULL; j++) {
+                        fprintf(stderr, "%s%s", args[j], (args[j+1] != NULL) ? " " : "");
+                    }
+                    fprintf(stderr, "\"\n");
+                    perror("Reason");
+                    exit(1);
+                }
+            }
+            else { //parent
+                if (need_wait) {
+                    waitpid(pid, NULL, 0);
+                }
             }
         }
     }
