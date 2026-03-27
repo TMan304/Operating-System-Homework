@@ -1,4 +1,4 @@
-obj-m += jiffies.o
+obj-m += jiffies.o seconds.o
 
 KNERAL_VERSION := $(shell uname -r)
 KNERAL_DIR := /lib/modules/$(KNERAL_VERSION)/build
