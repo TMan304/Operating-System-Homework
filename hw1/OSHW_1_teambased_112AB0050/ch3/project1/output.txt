@@ -1,6 +1,0 @@
-total 36
--rw-rw-r-- 1 user user     4 Mar 27 15:12 input.txt
--rw-r--r-- 1 user user     0 Mar 27 16:41 output.txt
--rw-r--r-- 1 user user     4 Mar 27 15:55 out.txt
--rwxrwxr-x 1 user user 17208 Mar 27 16:33 test
--rw-rw-r-- 1 user user  5789 Mar 27 16:39 UNIX_Shell.c
