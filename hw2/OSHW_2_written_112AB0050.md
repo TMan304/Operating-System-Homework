@@ -82,7 +82,7 @@
     - FCFS: 7.6ms
     - SJF: 5.2ms
     - Nonpreemptive Priority: 8.2ms
-    - RR: 10ms
+    - RR: 10ms  
     Ans: SJF has the minimum average waiting time.
 ### 5.22
 - 
