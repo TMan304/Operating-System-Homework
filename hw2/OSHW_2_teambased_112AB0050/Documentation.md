@@ -7,7 +7,8 @@
 - linux-headers-6.8.0-106-generic
 
 ## Ch4-1
-執行Makefile後會編譯出兩個核心模組(jiffies.ko、seconds.ko)，加載後分別會在初始化時在proc創建對應的檔案，對其進行讀取並印出的動作會分別輸出 系統開機以來的jiffies 和 second.ko加載後經過的秒數(都是在讀取時計算得出而非真的儲存在檔案中)，退出兩個核心模組會清理在proc創建的檔案
+- 描述: 執行後讀取參數檔案(沒輸入參數預設是input.txt)中的數字作為數獨解答，並創建共11個執行緒檢查該數獨解答是否合法，1個執行緒檢查所有欄，1個執行緒檢查所有列，9個執行緒分別檢查3*3的小九宮格，並將結果透過寫入全域變數的方法回傳給父執行緒，讓父執行緒判斷解答是否合法。
+- 編譯指令: gcc Sudoku_Solution_Validator.c -o Sudoku_Solution_Validator -pthread
 
 ## Ch4-2
 一個在linux上運行的shell介面，運行時會先輸出目前進程所在位置，使用者可以輸入要執行的操作，會由該進程fork子進程，子進程使用execvp呼叫系統API執行指令
