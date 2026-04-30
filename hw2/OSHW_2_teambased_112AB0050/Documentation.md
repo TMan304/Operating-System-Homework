@@ -11,12 +11,8 @@
 - 編譯指令: gcc Sudoku_Solution_Validator.c -o Sudoku_Solution_Validator -pthread
 
 ## Ch4-2
-一個在linux上運行的shell介面，運行時會先輸出目前進程所在位置，使用者可以輸入要執行的操作，會由該進程fork子進程，子進程使用execvp呼叫系統API執行指令
-- 會儲存上一次使用的指令，輸入!!會自動執行上一次指令
-- 最後參數沒有&的情況下進程會wait子進程完成，有&則會讓子進程在背景執行，不干擾使用者繼續使用
-- 能夠處理exit、cd這些內部指令
-- 支援|合併多個指令，由該進程創建pipe，並讓fork出的子進程透過pipe傳輸資料來實現合併
-- 支援<和>改變I/O，會使用dup2重新定向標準輸入輸出
+- 描述: 執行後讀取參數檔案位置(沒輸入參數預設是input.txt)中的數字作為排序數列，先創建2個執行緒讓其分別排序數列的前半段和後半段，結果放到全域變數中(雖然是操作同個陣列但是不同位置，所以不用管同步問題)，等執行完後再創建1個合併用的執行緒，將結果放到另一個全域變數，最後由主執行緒輸出結果。
+- 編譯指令: gcc MergeSort.c -o MergeSort -pthread
 
 ## Ch5
 - 描述: 執行後讀取參數檔案位置(沒輸入參數預設是task.txt)中的任務資訊，並輪流使用FCFS、SJF、Priority-based、Round-Robin、Priority with round-robin排序法來實際跑一輪，運行過程會輸出目前狀態在終端機。
