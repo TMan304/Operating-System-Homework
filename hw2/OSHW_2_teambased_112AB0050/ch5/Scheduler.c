@@ -167,12 +167,9 @@ void schedule_priority_rr() {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("用法: %s <tasks_file.txt>\n", argv[0]);
-        return 1;
-    }
-
-    load_tasks(argv[1]);
+    // 決定檔名並讀取檔案
+    const char* filename = (argc > 1) ? argv[1] : "task.txt";
+    load_tasks(filename);
     
     schedule_fcfs();
     schedule_sjf();

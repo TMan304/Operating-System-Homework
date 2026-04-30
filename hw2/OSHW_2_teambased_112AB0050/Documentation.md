@@ -7,7 +7,7 @@
 - linux-headers-6.8.0-106-generic
 
 ## Ch4-1
-- 描述: 執行後讀取參數檔案(沒輸入參數預設是input.txt)中的數字作為數獨解答，並創建共11個執行緒檢查該數獨解答是否合法，1個執行緒檢查所有欄，1個執行緒檢查所有列，9個執行緒分別檢查3*3的小九宮格，並將結果透過寫入全域變數的方法回傳給父執行緒，讓父執行緒判斷解答是否合法。
+- 描述: 執行後讀取參數檔案位置(沒輸入參數預設是input.txt)中的數字作為數獨解答，並創建共11個執行緒檢查該數獨解答是否合法，1個執行緒檢查所有欄，1個執行緒檢查所有列，9個執行緒分別檢查3*3的小九宮格，並將結果透過寫入全域變數的方法回傳給父執行緒，讓父執行緒判斷解答是否合法。
 - 編譯指令: gcc Sudoku_Solution_Validator.c -o Sudoku_Solution_Validator -pthread
 
 ## Ch4-2
@@ -19,4 +19,5 @@
 - 支援<和>改變I/O，會使用dup2重新定向標準輸入輸出
 
 ## Ch5
-執行Makefile後會編譯出兩個核心模組(task_dfs.ko、task_liner.ko)，加載後分別在初始化時透過不同的遍歷方式輸出目前系統所有的進程
+- 描述: 執行後讀取參數檔案位置(沒輸入參數預設是task.txt)中的任務資訊，並輪流使用FCFS、SJF、Priority-based、Round-Robin、Priority with round-robin排序法來實際跑一輪，運行過程會輸出目前狀態在終端機。
+- 編譯指令: gcc Scheduler.c -o Scheduler
