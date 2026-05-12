@@ -29,6 +29,7 @@ south() {
     mutex.unlock()
 }
 ```
+
 ## Ch9
 ### 9.13
 | 記憶體區域 | 100MB      | 170MB | 40MB | 205MB | 300MB       | 185MB      |
